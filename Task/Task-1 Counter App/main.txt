@@ -1,0 +1,128 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() => runApp(Main());
+
+class Main extends StatelessWidget {
+  const Main({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MainPage(),
+    );
+  }
+}
+
+class MainPage extends StatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  var _count = 0;
+
+  void getCountValue() async {
+    var prefs = await SharedPreferences.getInstance();
+    final int? valueCount = prefs.getInt('count');
+    setState(() {
+      _count = valueCount!;
+    });
+  }
+
+  @override
+  void initState() {
+    getCountValue();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    return SafeArea(
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [
+                Colors.lightBlue,
+                Colors.deepPurple,
+              ],
+            ),
+          ),
+          child: ListView(
+            children: [
+              SizedBox(
+                height: height * 0.20,
+              ),
+              Center(
+                child: Text(
+                  '$_count',
+                  style: TextStyle(fontSize: 200, color: Colors.white70),
+                ),
+              ),
+              SizedBox(
+                height: height * 0.14,
+              ),
+              Container(
+                padding: EdgeInsets.all(40),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _count = _count + 1;
+                            });
+                            _storeData();
+                          },
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.white70,
+                          ),
+                          iconSize: 40,
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: Container(
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _count = _count - 1;
+                            });
+                            _storeData();
+                          },
+                          icon: Icon(
+                            Icons.remove,
+                            color: Colors.white70,
+                          ),
+                          iconSize: 40,
+                        ),
+                      ),
+                    ),
+
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _storeData() async {
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('count', _count);
+  }
+}

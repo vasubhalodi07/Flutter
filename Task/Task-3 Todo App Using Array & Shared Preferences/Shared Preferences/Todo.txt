@@ -1,0 +1,109 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class Todo extends StatefulWidget {
+  const Todo({Key? key}) : super(key: key);
+
+  @override
+  State<Todo> createState() => _TodoState();
+}
+
+class _TodoState extends State<Todo> {
+
+  var arr = [];
+  TextEditingController _todo = TextEditingController();
+
+  void _getTodoData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? todo = prefs.getString("Todo_Key");
+    setState(() {
+      arr.add(todo);
+    });
+  }
+
+  @override
+  void initState() {
+    _getTodoData();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(30),
+          child: ListView(
+            children: [
+
+              SizedBox(height: height * 0.03,),
+
+              TextFormField(
+                controller: _todo,
+                decoration: InputDecoration(
+                  labelText: 'Todo',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.only(left: 90, right: 90),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _storeSP();
+                    });
+                    print(arr);
+                  },
+                  child: Text('Create'),
+                ),
+              ),
+
+              SizedBox(height: height * 0.03,),
+
+              Center(child: Text('Todo List', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)),
+
+              SizedBox(height: height * 0.01,),
+
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: arr.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    elevation: 2,
+                    child: ListTile(
+                      leading: Icon(Icons.today_outlined, color: Colors.blue,),
+                      title: Text('${arr[index]}'),
+                      trailing: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              arr.removeAt(index);
+                            });
+                          }, child: Icon(Icons.delete, color: Colors.red,)),
+                    ),
+                  );
+                },
+              ),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _storeSP() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('Todo_Key', _todo.text);
+    final String? todo = prefs.getString("Todo_Key");
+    setState(() {
+      arr.add(todo);
+    });
+  }
+
+}

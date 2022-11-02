@@ -1,0 +1,121 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+void main() => runApp(Main());
+
+class Main extends StatelessWidget {
+  const Main({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Home(),
+    );
+  }
+}
+
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+
+  var users = [];
+
+  @override
+  void initState() {
+    _getAPIData();
+    print(users);
+    super.initState();
+  }
+
+  void _getAPIData() async {
+    var url = Uri.parse('https://dummyjson.com/todos');
+    var response = await http.get(url);
+    var jsonData = jsonDecode(response.body);
+    var todo = jsonData['todos'];
+
+    for(var i in todo) {
+      todo_data t1 = todo_data(i['id'], i['todo'], i['completed'], i['userId']);
+      setState(() {
+        users.add(t1);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.teal.shade800,
+                Colors.blue.shade900,
+              ],
+          ),
+        ),
+        padding: EdgeInsets.all(20),
+
+        child: SafeArea(
+          child: Column(
+            children: [
+
+
+              Container(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                alignment: Alignment.topLeft,
+                child: Text('Todo', style: TextStyle(fontSize: 24, color: Colors.white),),
+              ),
+
+              SizedBox(height: height * 0.02,),
+
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: users.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: users[index]._completed ? Colors.blue : Colors.white,
+                      child: ListTile(
+                        leading: Text('${users[index]._id}', style: TextStyle(color: users[index]._completed ? Colors.white : Colors.black),),
+                        title: Text('${users[index]._todo!}', style: TextStyle(color: users[index]._completed ? Colors.white : Colors.black),),
+                      ),
+                    );
+                  }
+                ),
+              ),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class todo_data {
+  var id;
+  var todo;
+  var completed;
+  var userId;
+
+  todo_data(this.id, this.todo, this.completed, this.userId);
+
+  get _id { return id; }
+  get _todo {return todo; }
+  get _completed { return completed; }
+  get _userId {return userId; }
+}

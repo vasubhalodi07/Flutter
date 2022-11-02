@@ -1,0 +1,8 @@
+class song_data {
+  final String name;
+  final String image;
+  final String song;
+  final String singer;
+
+  song_data({required this.name, required this.image, required this.song, required this.singer});
+}

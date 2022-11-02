@@ -1,0 +1,163 @@
+import 'package:flutter/material.dart';
+import 'package:music_player/screen.dart';
+import 'model/song.dart';
+
+class ListSong extends StatefulWidget {
+  const ListSong({Key? key}) : super(key: key);
+
+  @override
+  State<ListSong> createState() => _ListSongState();
+}
+
+class _ListSongState extends State<ListSong> {
+
+  List<song_data> data = [
+    song_data(
+        name: 'Hold On',
+        image: 'https://i1.sndcdn.com/artworks-000150929796-6bn7ic-t500x500.jpg',
+        song: 'audio/Hold-On.mp3',
+        singer: 'Justin Bieber'
+    ),
+
+    song_data(
+        name: 'Lonely',
+        image: 'https://www.udiscovermusic.com/wp-content/uploads/2020/10/Justin-Bieber-Lonely.jpg',
+        song: 'audio/Lonely.mp3',
+        singer: 'Justin Bieber'
+    ),
+
+    song_data(
+        name: 'Somebody',
+        image: 'https://i.scdn.co/image/ab67616d0000b273e6f407c7f3a0ec98845e4431',
+        song: 'audio/Somebody.mp3',
+        singer: 'Justin Bieber'
+    ),
+
+    song_data(
+        name: '2 Much',
+        image: 'https://i1.sndcdn.com/artworks-N573VgDN1FKzmR1M-hHJ5OA-t500x500.jpg',
+        song: 'audio/2-Much.mp3',
+        singer: 'Justin Bieber'
+    ),
+
+    song_data(
+        name: 'Believe',
+        image: 'https://live.staticflickr.com/8159/7446536094_b609f8962e_b.jpg',
+        song: 'audio/Believe.mp3',
+        singer: 'Justin Bieber'
+    ),
+
+    song_data(
+        name: 'Let Me Love You',
+        image: 'https://lastfm.freetls.fastly.net/i/u/ar0/c800779a399447228ab7cc929bb8895a.jpg',
+        song: 'audio/Let-Me-Love-You.mp3',
+        singer: 'Justin Bieber & DJ Snake'
+    ),
+
+    song_data(
+        name: 'Love You Different',
+        image: 'https://i.ytimg.com/vi/WFY0ffG2hHM/maxresdefault.jpg',
+        song: 'audio/Love-You-Different.mp3',
+        singer: 'Justin Bieber'
+    ),
+
+    song_data(
+        name: 'Peaches',
+        image: 'https://static.elmundo.sv/wp-content/uploads/2021/04/justin-bieber.png',
+        song: 'audio/Peaches.mp3',
+        singer: 'Justin Bieber'
+    ),
+
+    song_data(
+        name: 'Stay',
+        image: 'https://i.scdn.co/image/ab67616d0000b27341e31d6ea1d493dd77933ee5',
+        song: 'audio/Stay.mp3',
+        singer: 'Justin Bieber & The Kid LAROI'
+    ),
+
+    song_data(
+        name: 'Unstable',
+        image: 'https://i.ytimg.com/vi/Nasd4YzPxQQ/maxresdefault.jpg',
+        song: 'audio/Peaches.mp3',
+        singer: 'Justin Bieber & The Kid LAROI'
+    ),
+
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+
+            Stack(
+              children: [
+
+                Image.network(
+                  'http://wallpaperset.com/w/full/3/f/6/251852.jpg',
+                  width: double.infinity,
+                  height: 250,
+                  fit: BoxFit.cover,
+                ),
+
+                Positioned(
+                  bottom: 20,
+                  right: 60,
+                  child: Container(
+                    width: 300,
+                    child: Text(
+                      'Justin Bieber',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            Flexible(
+              child: Container(
+                padding: EdgeInsets.all(20),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: data.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Music(item: data[index]),),);
+                      },
+                      child: Card(
+                        elevation: 3,
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage('${data[index].image}'),
+                            backgroundColor: Colors.transparent,
+                          ),
+                          title: Text('${data[index].name}'),
+                          trailing: GestureDetector(
+                            onTap: () {
+                              print('${index}');
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => Music(item: data[index]),),);
+                            },
+                            child: Icon(Icons.keyboard_arrow_right_outlined),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+}
+
