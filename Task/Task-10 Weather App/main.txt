@@ -256,7 +256,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<void> _getAPIData(String city) async {
+  void _getAPIData(String city) async {
 
     var url = Uri.parse('https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=a3c2dec13a0b20e41e57d1f8ceaaed21');
     var response = await http.get(url);
