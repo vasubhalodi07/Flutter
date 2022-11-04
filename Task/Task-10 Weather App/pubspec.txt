@@ -1,0 +1,10 @@
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  shared_preferences: ^2.0.15
+  http: ^0.13.5
+  flutter_spinkit: ^5.1.0
+  charcode: ^1.2.0
+  intl: ^0.17.0
