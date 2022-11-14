@@ -1,0 +1,182 @@
+import 'dart:convert';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var app = await Firebase.initializeApp();
+  runApp(MyApp(app));
+}
+
+class MyApp extends StatelessWidget {
+  var app;
+  MyApp(this.app);
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'CRUD',
+      theme: ThemeData(primarySwatch: Colors.blue,),
+      home: MyHomePage(app),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  var app;
+  MyHomePage(this.app);
+  @override
+  _MyHomePageState createState() => _MyHomePageState(app);
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  var app;
+  _MyHomePageState(this.app);
+  FirebaseDatabase? database;
+  DatabaseReference? referenceTodo;
+  int upIndex = 0;
+
+  List<List<String>> todo = <List<String>>[];
+  var _t1 = TextEditingController();
+  String _task = "Add";
+
+  @override
+  Widget build(BuildContext context) {
+
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    database = FirebaseDatabase(app: app);
+    referenceTodo = database?.reference().child("todos");
+
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: [
+
+              SizedBox(height: height * 0.02,),
+
+              Container(
+                child: TextField(
+                  cursorHeight: 20,
+                  cursorWidth: 1,
+                  cursorColor: Colors.black,
+                  controller: _t1,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.today_outlined, color: Colors.blue,),
+                    hintText: 'Todos',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                  ),
+                ),
+              ),
+
+              ElevatedButton(
+                onPressed: () {
+                  if (_task == "Add") {
+                    add(_t1.text);
+                  } else {
+                    update(_t1.text, upIndex);
+                    _task = "Add";
+                  }
+                  _t1.text = "";
+                },
+                child: Text(_task),
+              ),
+
+              SizedBox(height: height * 0.03,),
+
+              FutureBuilder(
+                future: referenceTodo?.once(),
+                builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+                  if (snapshot.hasData) {
+                    todo.clear();
+                    var values = snapshot.requireData.snapshot.children;
+                    values.forEach((element) {
+                      var a = jsonEncode(element.value);
+                      var b = jsonDecode(a);
+                      List<String> data = [b["todo"], b["id"]];
+                      todo.add(data);
+                    });
+                  }
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: todo.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Card(
+                          child: ListTile(
+                            title: Text(todo[index][0]),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _task = "Update";
+                                      _t1.text = todo[index][0];
+                                      upIndex = index;
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+
+                                SizedBox(width: width * 0.03,),
+
+                                GestureDetector(
+                                  onTap: () {
+                                    delete(index);
+                                  },
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void add(String todo) async {
+    String? key = referenceTodo?.push().key;
+    setState(() {
+      referenceTodo?.child(key!).set({"id": key, "todo": todo});
+    });
+  }
+
+  void delete(int index) async {
+    setState(() {
+      referenceTodo?.child(todo[index][1]).remove();
+    });
+  }
+
+  void update(String newTodo, int index) async {
+    setState(() {
+      referenceTodo
+          ?.child(todo[index][1])
+          .update({"id": todo[index][1], "todo": newTodo});
+      upIndex = 0;
+    });
+  }
+}
